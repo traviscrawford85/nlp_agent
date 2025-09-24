@@ -1,0 +1,1 @@
+"""CLI integration layer for local services."""
