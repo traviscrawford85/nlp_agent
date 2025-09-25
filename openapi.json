@@ -1,0 +1,478 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NLP Agent API",
+    "description": "Type-safe NLP agent API with Clio constraints for natural language processing and CLI integration",
+    "version": "0.1.0",
+    "contact": {
+      "name": "NLP Agent API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check endpoint",
+        "operationId": "health_check",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query": {
+      "post": {
+        "summary": "Process natural language query",
+        "operationId": "process_query",
+        "parameters": [
+          {
+            "name": "x-rate-limit-user",
+            "in": "header",
+            "description": "User identifier for rate limiting",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Natural language query to process",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/queries": {
+      "get": {
+        "summary": "List processed queries with pagination and filtering",
+        "operationId": "list_queries",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (1-based)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by query status",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "processing", "completed", "failed"]
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Filter queries created after this timestamp",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of queries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cli/execute": {
+      "post": {
+        "summary": "Execute CLI command",
+        "operationId": "execute_cli",
+        "requestBody": {
+          "description": "CLI command to execute",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CLIRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "CLI command executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CLIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid CLI request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "healthy"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string",
+            "example": "0.1.0"
+          }
+        },
+        "required": ["status", "timestamp", "version"]
+      },
+      "QueryRequest": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Natural language query to process",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "context": {
+            "type": "object",
+            "description": "Optional context for the query",
+            "additionalProperties": true
+          },
+          "options": {
+            "$ref": "#/components/schemas/QueryOptions"
+          }
+        },
+        "required": ["query"]
+      },
+      "QueryOptions": {
+        "type": "object",
+        "properties": {
+          "timeout": {
+            "type": "integer",
+            "description": "Query timeout in seconds",
+            "minimum": 1,
+            "maximum": 300,
+            "default": 30
+          },
+          "include_metadata": {
+            "type": "boolean",
+            "description": "Include processing metadata in response",
+            "default": false
+          }
+        }
+      },
+      "QueryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique query identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"]
+          },
+          "result": {
+            "type": "object",
+            "description": "Query processing result",
+            "additionalProperties": true
+          },
+          "api_calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/APICall"
+            }
+          },
+          "cli_calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CLICall"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/QueryMetadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "status", "created_at"]
+      },
+      "APICall": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "response": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "duration_ms": {
+            "type": "number"
+          }
+        },
+        "required": ["endpoint", "method"]
+      },
+      "CLICall": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "stdout": {
+            "type": "string"
+          },
+          "stderr": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "duration_ms": {
+            "type": "number"
+          }
+        },
+        "required": ["command", "args", "exit_code"]
+      },
+      "QueryMetadata": {
+        "type": "object",
+        "properties": {
+          "processing_time_ms": {
+            "type": "number"
+          },
+          "tokens_used": {
+            "type": "integer"
+          },
+          "confidence_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "QueryListResponse": {
+        "type": "object",
+        "properties": {
+          "queries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueryResponse"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationInfo"
+          }
+        },
+        "required": ["queries", "pagination"]
+      },
+      "PaginationInfo": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_prev": {
+            "type": "boolean"
+          }
+        },
+        "required": ["page", "limit", "total", "pages", "has_next", "has_prev"]
+      },
+      "CLIRequest": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string",
+            "description": "CLI service to execute",
+            "enum": ["clio_service", "custom-fields-manager"]
+          },
+          "command": {
+            "type": "string",
+            "description": "Command to execute"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Command arguments"
+          },
+          "input_data": {
+            "type": "object",
+            "description": "JSON payload to pass to the command",
+            "additionalProperties": true
+          }
+        },
+        "required": ["service", "command"]
+      },
+      "CLIResponse": {
+        "type": "object",
+        "properties": {
+          "stdout": {
+            "type": "string"
+          },
+          "stderr": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "duration_ms": {
+            "type": "number"
+          },
+          "parsed_output": {
+            "type": "object",
+            "description": "Parsed JSON output if applicable",
+            "additionalProperties": true
+          }
+        },
+        "required": ["stdout", "stderr", "exit_code", "duration_ms"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["error", "message", "timestamp"]
+      }
+    }
+  }
+}
