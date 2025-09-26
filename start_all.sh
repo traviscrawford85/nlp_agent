@@ -52,45 +52,20 @@ else
     exit 1
 fi
 
-# Set OpenAI API key if not already set
+# Load OpenAI API key from environment or .env (no hard-coded secrets)
+if [ -z "$OPENAI_API_KEY" ] && [ -f ".env" ]; then
+    echo -e "${CYAN}🔑 Loading environment from .env${NC}"
+    set -a
+    source .env
+    set +a
+fi
+
 if [ -z "$OPENAI_API_KEY" ]; then
-    echo -e "${YELLOW}⚠️  OPENAI_API_KEY not set in environment${NC}"
-    echo -e "${CYAN}Using the provided API key...${NC}"
+    echo -e "${RED}❌ OPENAI_API_KEY is not set. Set it in your shell or create a .env file first.${NC}"
+    echo -e "${YELLOW}   Example: echo 'OPENAI_API_KEY=sk-...' >> .env${NC}"
+    exit 1
 else
     echo -e "${GREEN}✅ Using OPENAI_API_KEY from environment${NC}"
-fi
-if [ -z "$OPENAI_API_KEY" ]; then
-    if [ -f ".env" ]; then
-        echo -e "${CYAN}\ud83d\udd11 Loading environment from .env${NC}"
-        set -a
-        source .env
-        set +a
-    fi
-fi
-
-if [ -z "$OPENAI_API_KEY" ]; then
-    echo -e "${RED}\u274c OPENAI_API_KEY is not set. Set it in your shell or create a .env file first.${NC}"
-    echo -e "${YELLOW}   Example: echo 'OPENAI_API_KEY=sk-...' >> .env${NC}"
-    exit 1
-else
-    echo -e "${GREEN}\u2705 Using OPENAI_API_KEY from environment${NC}"
-fi
-if [ -z "$OPENAI_API_KEY" ]; then
-    if [ -f ".env" ]; then
-        echo -e "${CYAN}\ud83d\udd11 Loading environment from .env${NC}"
-        set -a
-        source .venv/bin/activate 2>/dev/null || true
-        source .env
-        set +a
-    fi
-fi
-
-if [ -z "$OPENAI_API_KEY" ]; then
-    echo -e "${RED}\u274c OPENAI_API_KEY is not set. Set it in your shell or create a .env file first.${NC}"
-    echo -e "${YELLOW}   Example: echo 'OPENAI_API_KEY=sk-...' >> .env${NC}"
-    exit 1
-else
-    echo -e "${GREEN}\u2705 Using OPENAI_API_KEY from environment${NC}"
 fi
 
 # Run setup verification
