@@ -1,0 +1,92 @@
+{
+    "info": {
+        "name": "Clio Custom Field Set",
+        "_postman_id": "f81c9e45-6b7c-4b0c-a62d-dc64e0e22a5b",
+        "description": "Update Clio custom field set with ordered custom field IDs",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Update Custom Field Set",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/x-www-form-urlencoded"
+                    },
+                    {
+                        "key": "Cookie",
+                        "value": "{{session_cookie}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/settings/custom_field_sets/{{custom_field_set_id}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "settings",
+                        "custom_field_sets",
+                        "{{custom_field_set_id}}"
+                    ]
+                },
+                "body": {
+                    "mode": "urlencoded",
+                    "urlencoded": [
+                        {
+                            "key": "_method",
+                            "value": "patch",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[name]",
+                            "value": "Essential Data",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[parent_type]",
+                            "value": "Matter",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "8340541",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "8340661",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "15165781",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "8344756",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "12932447",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "15211996",
+                            "type": "text"
+                        },
+                        {
+                            "key": "custom_field_set[custom_field_ids][]",
+                            "value": "14262046",
+                            "type": "text"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

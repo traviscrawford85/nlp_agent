@@ -1,0 +1,189 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Clio Private UI API (Partial Spec)",
+    "version": "0.1.0",
+    "description": "Reverse engineered private endpoints used by Clio's UI for settings, custom fields, and matter numbering."
+  },
+  "servers": [
+    {
+      "url": "https://app.clio.com"
+    }
+  ],
+  "paths": {
+    "/settings/custom_field_sets/{id}": {
+      "post": {
+        "summary": "Update a Custom Field Set",
+        "description": "Updates a custom field set, including the list of associated custom fields.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_method": {
+                    "type": "string",
+                    "example": "patch"
+                  },
+                  "custom_field_set[parent_type]": {
+                    "type": "string",
+                    "example": "Matter"
+                  },
+                  "custom_field_set[name]": {
+                    "type": "string",
+                    "example": "Essential Data"
+                  },
+                  "custom_field_set[custom_field_ids][]": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "example": [
+                      8340511,
+                      8340541
+                    ]
+                  },
+                  "custom_field_set[displayed]": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Custom field set updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/custom_fields": {
+      "get": {
+        "summary": "List Custom Fields",
+        "description": "Retrieve custom fields filtered by parent type (e.g., Matter).",
+        "parameters": [
+          {
+            "name": "parent_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "matter"
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "custom_matter_fields"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of custom fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "display_order": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/matter_numbering": {
+      "get": {
+        "summary": "Get Matter Numbering Settings",
+        "description": "Retrieve matter numbering format, prefix, and sequence.",
+        "responses": {
+          "200": {
+            "description": "Matter numbering configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Update Matter Numbering Settings",
+        "description": "Update matter numbering prefix, format, and other settings.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "matter_numbering[prefix]": {
+                    "type": "string",
+                    "example": "MAT-"
+                  },
+                  "matter_numbering[sequence]": {
+                    "type": "integer",
+                    "example": 1001
+                  },
+                  "matter_numbering[format]": {
+                    "type": "string",
+                    "example": "prefix-number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matter numbering updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
