@@ -333,6 +333,7 @@ curl http://localhost:8000/auth/status
 - **`tools/clio_api.py`** - Complete Clio API wrapper
 - **`tools/clio_cli.py`** - `~/clio_service` CLI integration
 - **`tools/custom_fields_cli.py`** - `~/custom-fields-manager` CLI integration
+- **`tools/custom_fields_workflow_tools.py`** - Wrappers for numbered workflow scripts in `~/custom-fields-manager`
 
 ### Available Tools
 
@@ -353,6 +354,20 @@ The agent has 11 specialized tools:
 | `execute_custom_fields_cli` | Run CFM commands | "Generate usage report" |
 
 ---
+
+### Numbered Workflow Scripts (Custom Fields)
+
+The agent exposes wrappers to run the external custom-fields-manager workflow scripts by number. Examples:
+
+- List scripts and whether they exist on disk:
+   - Tool: `cfm_list_workflow_scripts`
+   - Args: `{ "base_dir": "/home/sysadmin01/custom-fields-manager" }` (optional)
+
+- Execute a specific script and pass flags in `extra_args`:
+   - `cfm_03_fetch_clio_session` (auth), `cfm_04_create_custom_fields` (create), `cfm_08_resequence_display_order` (organize), `cfm_12_generate_migration_dashboard` (report), etc.
+   - Args example: `{ "extra_args": "--help" }`
+
+Scripts are resolved under `scripts/`, `workflow/`, or the repo root in `~/custom-fields-manager`.
 
 ## 🔒 Security & Authentication
 

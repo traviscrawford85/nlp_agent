@@ -24,6 +24,7 @@ from tools.clio_api import ClioAPIWrapper
 from tools.clio_cli import ClioServiceCLI, CliResult
 from tools.custom_fields_cli import CustomFieldsCLI
 from tools.custom_field_set_tools import get_custom_field_set_tools
+from tools.custom_fields_workflow_tools import get_custom_fields_workflow_tools
 from models.responses import AgentThought, ToolExecutionResult
 
 
@@ -209,7 +210,10 @@ class ClioNLPAgent:
             )
         ])
 
-        # Custom field set management tools (Web UI endpoints)
+    # Custom fields workflow scripts (external repo numbered scripts)
+    tools.extend(get_custom_fields_workflow_tools())
+
+    # Custom field set management tools (Web UI endpoints)
         custom_field_set_tools = get_custom_field_set_tools()
         tools.extend(custom_field_set_tools)
 
